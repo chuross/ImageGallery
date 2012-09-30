@@ -7,17 +7,35 @@
         android:minSdkVersion="14"
         android:targetSdkVersion="15" />
 
+    <uses-permission android:name="android.permission.INTERNET" >
+    </uses-permission>
+」
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <activity
-            android:name=".domain.app.MainActivity"
-            android:label="@string/title_activity_main" >
+        <activity android:name=".domain.app.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".domain.app.DropboxAuthActivity" >
+        </activity>
+        <activity
+            android:name="com.dropbox.client2.android.AuthActivity"
+            android:configChanges="orientation|keyboard"
+            android:launchMode="singleTask" >
+    
+            <intent-filter>
+                <data android:scheme="db-tyodkug53m0tcm6" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+     
             </intent-filter>
         </activity>
     </application>
