@@ -18,6 +18,7 @@ public class MainActivity extends Activity {
 		Resources res = getResources();
 		SharedPreferences sp = getSharedPreferences(res.getString(R.string.sp_dropbox_auth), MODE_PRIVATE);
 
+		// 初回起動
 		if (!sp.getBoolean(res.getString(R.string.sp_key_is_autentication), false)) {
 			finish();
 			startActivity(new Intent(this, DropboxAuthActivity.class));
