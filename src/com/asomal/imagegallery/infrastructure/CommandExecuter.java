@@ -16,13 +16,18 @@ public class CommandExecuter {
 	 * @param command 処理したいコマンド
 	 * @param listener 終了時の処理
 	 */
-	public static <T> Executer<T> post(Command<T> command, Command.OnFinishListener<T> listener) {
+	public static <T> Executer<T> post(final Command<T> command, final Command.OnFinishListener<T> listener) {
 
 		return new Executer<T>() {
 
 			@Override
 			protected T doInBackground(Void... params) {
-				return null;
+				return command.execute();
+			}
+
+			@Override
+			protected void onPostExecute(T result) {
+				listener.onFinished(result);
 			}
 		};
 

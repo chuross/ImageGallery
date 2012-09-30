@@ -19,6 +19,6 @@ public interface Command<T> {
 
 	}
 
-	public void execute();
+	public T execute();
 
 }
