@@ -6,8 +6,10 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.asomal.imagegallery.R;
+import com.asomal.imagegallery.util.Logger;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.session.AccessTokenPair;
@@ -23,11 +25,7 @@ import com.dropbox.client2.session.Session.AccessType;
  */
 public class DropboxAuthActivity extends Activity {
 
-	private static final String SP_KEY_ACCESS_TOKEN = "access_token";
-
-	private static final String SP_KEY_ACCESS_TOKEN_SECRET = "access_token_secret";
-
-	private static final String SP_IS_AUTHENTICATION = "";
+	private static final String TAG = DropboxAuthActivity.class.getSimpleName();
 
 	private DropboxAPI<AndroidAuthSession> dropboxApi;
 
@@ -57,9 +55,15 @@ public class DropboxAuthActivity extends Activity {
 			SharedPreferences sp = getSharedPreferences(res.getString(R.string.sp_dropbox_auth), MODE_PRIVATE);
 			Editor edit = sp.edit();
 			edit.putBoolean(res.getString(R.string.sp_key_is_autentication), true);
-			edit.putString(SP_KEY_ACCESS_TOKEN, tokens.key);
-			edit.putString(SP_KEY_ACCESS_TOKEN_SECRET, tokens.secret);
-			edit.commit();
+			edit.putString(res.getString(R.string.sp_key_access_token), tokens.key);
+			edit.putString(res.getString(R.string.sp_key_access_token_secret), tokens.secret);
+
+			if (edit.commit()) {
+				Logger.d(TAG, "アカウント同期　token: " + tokens.key + " tokenSecret: " + tokens.secret);
+				Toast.makeText(this, "アカウントの同期が完了しました。", Toast.LENGTH_SHORT).show();
+			} else {
+				Toast.makeText(this, "アカウントの同期に失敗しました。", Toast.LENGTH_SHORT).show();
+			}
 
 			finish();
 			// TODO onActivityResultで処理させたい
