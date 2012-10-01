@@ -7,11 +7,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.widget.GridView;
 
 import com.asomal.imagegallery.R;
 import com.asomal.imagegallery.domain.image.GetRemoteImageFilePathCommand;
 import com.asomal.imagegallery.infrastructure.Command;
 import com.asomal.imagegallery.infrastructure.CommandExecuter;
+import com.asomal.imagegallery.view.image.ImageGridAdapter;
 
 public class MainActivity extends Activity {
 
@@ -34,6 +36,9 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onFinished(List<String> result) {
+				ImageGridAdapter adapter = new ImageGridAdapter(MainActivity.this, result);
+				GridView gridView = (GridView) findViewById(R.id.main_gridview);
+				gridView.setAdapter(adapter);
 			}
 		});
 	}

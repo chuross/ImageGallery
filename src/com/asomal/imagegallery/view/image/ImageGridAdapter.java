@@ -12,6 +12,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.asomal.imagegallery.R;
+import com.asomal.imagegallery.domain.image.GetThumbnailImageCommand;
+import com.asomal.imagegallery.infrastructure.Command;
+import com.asomal.imagegallery.infrastructure.CommandExecuter;
 
 /**
  * 画像をグリッド表示するためのアダプター
@@ -22,21 +25,23 @@ import com.asomal.imagegallery.R;
 public class ImageGridAdapter extends BaseAdapter {
 
 	LayoutInflater inflater;
-	List<Bitmap> bitmapList;
+	List<String> filePathList;
+	Context context;
 
-	public ImageGridAdapter(Context context, List<Bitmap> bitmapList) {
-		this.bitmapList = bitmapList;
+	public ImageGridAdapter(Context context, List<String> filePathList) {
+		this.context = context;
+		this.filePathList = filePathList;
 		inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
 
 	@Override
 	public int getCount() {
-		return bitmapList.size();
+		return filePathList.size();
 	}
 
 	@Override
 	public Object getItem(int position) {
-		return bitmapList.get(position);
+		return filePathList.get(position);
 	}
 
 	@Override
@@ -52,9 +57,21 @@ public class ImageGridAdapter extends BaseAdapter {
 			view = inflater.inflate(R.layout.image_gridview_row, null);
 		}
 
-		ProgressBar progress = (ProgressBar) view.findViewById(R.id.progress);
-		ImageView imageView = (ImageView) view.findViewById(R.id.grid_imageview);
+		String filePath = filePathList.get(position);
 
-		return null;
+		final ProgressBar progress = (ProgressBar) view.findViewById(R.id.progress);
+		final ImageView imageView = (ImageView) view.findViewById(R.id.grid_imageview);
+
+		CommandExecuter.post(new GetThumbnailImageCommand(context, filePath), new Command.OnFinishListener<Bitmap>() {
+
+			@Override
+			public void onFinished(Bitmap result) {
+				imageView.setImageBitmap(result);
+				imageView.setVisibility(View.VISIBLE);
+				progress.setVisibility(View.GONE);
+			}
+		});
+
+		return view;
 	}
 }

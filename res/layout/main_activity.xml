@@ -4,12 +4,12 @@
     android:layout_height="match_parent" >
 
     <GridView
-        android:id="@+id/image_gridview"
+        android:id="@+id/main_gridview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:columnWidth="60dp"
+        android:layout_height="match_parent"
+        android:columnWidth="100dp"
         android:horizontalSpacing="10dp"
-        android:numColumns="auto_fit"
+        android:numColumns="3"
         android:verticalSpacing="10dp" />
 
 </RelativeLayout>
