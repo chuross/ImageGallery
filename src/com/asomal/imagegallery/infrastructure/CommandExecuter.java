@@ -11,7 +11,7 @@ public class CommandExecuter {
 	/**
 	 * 非同期処理を実行する
 	 * 
-	 * @param <T>
+	 * @param <T> 戻り値の型
 	 * 
 	 * @param command 処理したいコマンド
 	 * @param listener 終了時の処理
@@ -27,6 +27,10 @@ public class CommandExecuter {
 
 			@Override
 			protected void onPostExecute(T result) {
+				if (listener == null) {
+					return;
+				}
+
 				listener.onFinished(result);
 			}
 		};

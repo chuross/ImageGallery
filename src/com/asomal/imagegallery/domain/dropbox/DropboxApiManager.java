@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import com.asomal.imagegallery.R;
 import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
+import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session.AccessType;
@@ -47,9 +48,9 @@ public class DropboxApiManager {
 	 * 認証済みAPIを取得する
 	 * 
 	 * @return 認証済みAPI
-	 * @throws ApiException Tokenがnullの時
+	 * @throws DropboxException Tokenがnullの時
 	 */
-	public DropboxAPI<AndroidAuthSession> getApi() throws ApiException {
+	public DropboxAPI<AndroidAuthSession> getApi() throws DropboxException {
 		SharedPreferences sp = context.getSharedPreferences(res.getString(R.string.sp_dropbox_auth),
 				Context.MODE_PRIVATE);
 
@@ -57,7 +58,7 @@ public class DropboxApiManager {
 		String userSecret = sp.getString(res.getString(R.string.sp_key_access_token_secret), null);
 
 		if (userToken == null || userSecret == null) {
-			throw new ApiException("Token is null.");
+			throw new DropboxException("Token is null.");
 		}
 
 		AppKeyPair access = new AppKeyPair(res.getString(R.string.dropbox_app_key),

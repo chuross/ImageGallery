@@ -60,8 +60,8 @@ public class DropboxAuthActivity extends Activity {
 			Toast.makeText(this, "アカウントの同期に失敗しました。", Toast.LENGTH_SHORT).show();
 		}
 
-		finish();
 		// TODO onActivityResultで処理させたい
 		startActivity(new Intent(this, MainActivity.class));
+		finish();
 	}
 }
