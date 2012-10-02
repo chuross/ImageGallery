@@ -58,14 +58,18 @@ public class ImageGridAdapter extends BaseAdapter {
 		}
 
 		String filePath = filePathList.get(position);
-
+		// TODO ViewHolder使いたい
 		final ProgressBar progress = (ProgressBar) view.findViewById(R.id.progress);
 		final ImageView imageView = (ImageView) view.findViewById(R.id.grid_imageview);
 
+		// TODO Tagでの判別どうしよう
 		CommandExecuter.post(new GetThumbnailImageCommand(context, filePath), new Command.OnFinishListener<Bitmap>() {
 
 			@Override
 			public void onFinished(Bitmap result) {
+				if (result == null) {
+					return;
+				}
 				imageView.setImageBitmap(result);
 				imageView.setVisibility(View.VISIBLE);
 				progress.setVisibility(View.GONE);

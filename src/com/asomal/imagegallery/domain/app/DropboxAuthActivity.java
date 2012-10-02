@@ -15,7 +15,6 @@ import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.session.AccessTokenPair;
 
-//TODO 認証処理は別クラスにもっていきたい
 /**
  * Dropbox認証用Activity
  * 

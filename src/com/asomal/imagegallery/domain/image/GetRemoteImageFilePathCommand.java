@@ -34,7 +34,7 @@ public class GetRemoteImageFilePathCommand implements Command<List<String>> {
 		List<String> pathList = new ArrayList<String>();
 		try {
 			DropboxAPI<AndroidAuthSession> dropboxApi = new DropboxApiManager(context).getApi();
-			Entry dirEntry = dropboxApi.metadata("/", 20, null, true, null);
+			Entry dirEntry = dropboxApi.metadata("/", 1000, null, true, null);
 
 			List<Entry> fileList = dirEntry.contents;
 			for (Entry entry : fileList) {
