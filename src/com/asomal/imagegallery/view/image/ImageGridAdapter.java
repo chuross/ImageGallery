@@ -50,32 +50,48 @@ public class ImageGridAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		View view = convertView;
 
+		final ViewHolder holder;
 		if (view == null) {
 			view = inflater.inflate(R.layout.image_gridview_row, null);
+			final ProgressBar progress = (ProgressBar) view.findViewById(R.id.progress);
+			final ImageView imageView = (ImageView) view.findViewById(R.id.grid_imageview);
+
+			holder = new ViewHolder();
+			holder.progress = progress;
+			holder.imageView = imageView;
+
+			view.setTag(holder);
+		} else {
+			holder = (ViewHolder) view.getTag();
+			holder.imageView.setVisibility(View.INVISIBLE);
+			holder.progress.setVisibility(View.VISIBLE);
 		}
 
-		String filePath = filePathList.get(position);
-		// TODO ViewHolder使いたい
-		final ProgressBar progress = (ProgressBar) view.findViewById(R.id.progress);
-		final ImageView imageView = (ImageView) view.findViewById(R.id.grid_imageview);
+		final String filePath = filePathList.get(position);
+		holder.imageView.setTag(filePath);
 
 		// TODO Tagでの判別どうしよう
 		CommandExecuter.post(new GetThumbnailImageCommand(context, filePath), new Command.OnFinishListener<Bitmap>() {
 
 			@Override
 			public void onFinished(Bitmap result) {
-				if (result == null) {
+				if (result == null && !filePath.equals(holder.imageView.getTag().toString())) {
 					return;
 				}
-				imageView.setImageBitmap(result);
-				imageView.setVisibility(View.VISIBLE);
-				progress.setVisibility(View.GONE);
+				holder.imageView.setImageBitmap(result);
+				holder.imageView.setVisibility(View.VISIBLE);
+				holder.progress.setVisibility(View.GONE);
 			}
 		});
 
 		return view;
+	}
+
+	private class ViewHolder {
+		ProgressBar progress;
+		ImageView imageView;
 	}
 }

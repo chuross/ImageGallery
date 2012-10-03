@@ -3,13 +3,11 @@ package com.asomal.imagegallery.domain.image;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.SoftReference;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import com.asomal.imagegallery.domain.dropbox.DropboxApiManager;
 import com.asomal.imagegallery.util.DisplaySize;
@@ -31,7 +29,9 @@ public class ImageCache {
 
 	private static final String TAG = ImageCache.class.getSimpleName();
 
-	private static NavigableMap<String, SoftReference<Bitmap>> memCache = new TreeMap<String, SoftReference<Bitmap>>();
+	private static final float THUMBNAIL_DP = 100;
+
+	private static NavigableMap<String, Bitmap> memCache = new TreeMap<String, Bitmap>();
 
 	private static Context staticContext;
 
@@ -54,20 +54,14 @@ public class ImageCache {
 
 		// メモリキャッシュから読み込む
 		if (hasImage(fileName)) {
-			SoftReference<Bitmap> ref = memCache.get(fileName);
-
-			if (ref == null) {
-				return null;
-			}
-
-			return ref.get();
+			return memCache.get(fileName);
 		}
 
 		// ローカルファイルからの読み込み
 		try {
 			InputStream in = staticContext.openFileInput(fileName);
 
-			Bitmap image = BitmapFactory.decodeStream(in);
+			Bitmap image = ImageUtil.getThumbnail(DisplaySize.getInstance(staticContext).pxToDip(THUMBNAIL_DP), in);
 			setImage(fileName, image);
 
 			return image;
@@ -80,7 +74,7 @@ public class ImageCache {
 
 				InputStream in = staticContext.openFileInput(fileName);
 
-				Bitmap image = ImageUtil.getThumbnail(DisplaySize.getInstance(staticContext).pxToDip(100), in);
+				Bitmap image = ImageUtil.getThumbnail(DisplaySize.getInstance(staticContext).pxToDip(THUMBNAIL_DP), in);
 				setImage(fileName, image);
 
 				return image;
@@ -104,7 +98,7 @@ public class ImageCache {
 		if (memCache.size() > MAX_CACHE) {
 			memCache.remove(memCache.firstKey());
 		}
-		memCache.put(key, new SoftReference<Bitmap>(image));
+		memCache.put(key, image);
 	}
 
 	/**
