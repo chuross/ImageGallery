@@ -11,8 +11,13 @@ import android.os.AsyncTask;
  */
 public abstract class Executer<T> extends AsyncTask<Void, Void, T> {
 
+	AsyncTask<Void, Void, T> task;
+
 	public Executer() {
-		execute();
+		task = execute();
 	}
 
+	public void cancel() {
+		task.cancel(true);
+	}
 }

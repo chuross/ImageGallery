@@ -15,6 +15,8 @@ import com.asomal.imagegallery.R;
 import com.asomal.imagegallery.domain.image.GetThumbnailImageCommand;
 import com.asomal.imagegallery.infrastructure.Command;
 import com.asomal.imagegallery.infrastructure.CommandExecuter;
+import com.asomal.imagegallery.infrastructure.Executer;
+import com.asomal.imagegallery.infrastructure.ListViewExecuteManager;
 
 /**
  * 画像をグリッド表示するためのアダプター
@@ -27,11 +29,13 @@ public class ImageGridAdapter extends BaseAdapter {
 	LayoutInflater inflater;
 	List<String> filePathList;
 	Context context;
+	ListViewExecuteManager<Bitmap> executeManager;
 
 	public ImageGridAdapter(Context context, List<String> filePathList) {
 		this.context = context;
 		this.filePathList = filePathList;
 		inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		executeManager = new ListViewExecuteManager<Bitmap>();
 	}
 
 	@Override
@@ -55,7 +59,7 @@ public class ImageGridAdapter extends BaseAdapter {
 
 		final ViewHolder holder;
 		if (view == null) {
-			view = inflater.inflate(R.layout.image_gridview_row, null);
+			view = inflater.inflate(R.layout.image_gridview_row, parent, false);
 			final ProgressBar progress = (ProgressBar) view.findViewById(R.id.progress);
 			final ImageView imageView = (ImageView) view.findViewById(R.id.grid_imageview);
 
@@ -74,20 +78,29 @@ public class ImageGridAdapter extends BaseAdapter {
 		holder.imageView.setTag(filePath);
 
 		// TODO Tagでの判別どうしよう
-		CommandExecuter.post(new GetThumbnailImageCommand(context, filePath), new Command.OnFinishListener<Bitmap>() {
+		Executer<Bitmap> task = CommandExecuter.post(new GetThumbnailImageCommand(context, filePath),
+				new Command.OnFinishListener<Bitmap>() {
 
-			@Override
-			public void onFinished(Bitmap result) {
-				if (result == null || !filePath.equals(holder.imageView.getTag().toString())) {
-					return;
-				}
-				holder.imageView.setImageBitmap(result);
-				holder.imageView.setVisibility(View.VISIBLE);
-				holder.progress.setVisibility(View.GONE);
-			}
-		});
+					@Override
+					public void onFinished(Bitmap result) {
+						if (result == null || !filePath.equals(holder.imageView.getTag().toString())) {
+							return;
+						}
+						holder.imageView.setImageBitmap(result);
+						holder.imageView.setVisibility(View.VISIBLE);
+						holder.progress.setVisibility(View.GONE);
+
+						executeManager.remove(position);
+					}
+				});
+
+		executeManager.put(position, task);
 
 		return view;
+	}
+
+	public void clean(int start) {
+		executeManager.clean(start);
 	}
 
 	private class ViewHolder {
