@@ -78,7 +78,7 @@ public class ImageGridAdapter extends BaseAdapter {
 
 			@Override
 			public void onFinished(Bitmap result) {
-				if (result == null && !filePath.equals(holder.imageView.getTag().toString())) {
+				if (result == null || !filePath.equals(holder.imageView.getTag().toString())) {
 					return;
 				}
 				holder.imageView.setImageBitmap(result);
