@@ -11,6 +11,7 @@ import android.widget.AbsListView;
 import android.widget.GridView;
 
 import com.asomal.imagegallery.R;
+import com.asomal.imagegallery.domain.dropbox.DropboxDownlodCommand;
 import com.asomal.imagegallery.domain.image.GetRemoteImageFilePathCommand;
 import com.asomal.imagegallery.infrastructure.Command;
 import com.asomal.imagegallery.infrastructure.CommandExecuter;
@@ -37,21 +38,28 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onFinished(List<String> result) {
-				final ImageGridAdapter adapter = new ImageGridAdapter(MainActivity.this, result);
-				GridView gridView = (GridView) findViewById(R.id.main_gridview);
-				gridView.setAdapter(adapter);
-				gridView.setOnScrollListener(new AbsListView.OnScrollListener() {
+				CommandExecuter.post(new DropboxDownlodCommand(MainActivity.this, result),
+						new Command.OnFinishListener<List<String>>() {
 
-					@Override
-					public void onScrollStateChanged(AbsListView view, int scrollState) {
-					}
+							@Override
+							public void onFinished(List<String> result) {
+								final ImageGridAdapter adapter = new ImageGridAdapter(MainActivity.this, result);
+								GridView gridView = (GridView) findViewById(R.id.main_gridview);
+								gridView.setAdapter(adapter);
+								gridView.setOnScrollListener(new AbsListView.OnScrollListener() {
 
-					@Override
-					public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-							int totalItemCount) {
-						adapter.clean(firstVisibleItem);
-					}
-				});
+									@Override
+									public void onScrollStateChanged(AbsListView view, int scrollState) {
+									}
+
+									@Override
+									public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
+											int totalItemCount) {
+										adapter.clean(firstVisibleItem);
+									}
+								});
+							}
+						});
 			}
 		});
 	}

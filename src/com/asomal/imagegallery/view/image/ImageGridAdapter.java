@@ -77,7 +77,6 @@ public class ImageGridAdapter extends BaseAdapter {
 		final String filePath = filePathList.get(position);
 		holder.imageView.setTag(filePath);
 
-		// TODO Tagでの判別どうしよう
 		Executer<Bitmap> task = CommandExecuter.post(new GetThumbnailImageCommand(context, filePath),
 				new Command.OnFinishListener<Bitmap>() {
 

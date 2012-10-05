@@ -25,10 +25,12 @@ import com.dropbox.client2.exception.DropboxException;
  */
 public class ImageCache {
 
-	private static final int MAX_CACHE = 100;
+	// メモリキャッシュする数
+	private static final int MAX_CACHE = 150;
 
 	private static final String TAG = ImageCache.class.getSimpleName();
 
+	// サムネイルサイズ
 	private static final float THUMBNAIL_DP = 100;
 
 	private static NavigableMap<String, Bitmap> memCache = new TreeMap<String, Bitmap>();
