@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.widget.AbsListView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.asomal.imagegallery.R;
 import com.asomal.imagegallery.domain.dropbox.DropboxDownlodCommand;
@@ -38,6 +39,11 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onFinished(List<String> result) {
+				if (result.size() <= 0) {
+					Toast.makeText(MainActivity.this, "ネットワークに接続されていない可能性があります", Toast.LENGTH_LONG).show();
+					return;
+				}
+
 				CommandExecuter.post(new DropboxDownlodCommand(MainActivity.this, result),
 						new Command.OnFinishListener<List<String>>() {
 
