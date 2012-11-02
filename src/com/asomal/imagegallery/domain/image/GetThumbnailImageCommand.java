@@ -33,6 +33,7 @@ public class GetThumbnailImageCommand implements Command<Bitmap> {
 				return;
 			}
 
+			// ファイルがキャンセルなどで中途半端に書き込まれているとnullになる？ので一旦消す
 			context.deleteFile(fileName);
 		} catch (FileNotFoundException e) {
 			Logger.d(TAG, "Cancel file is not created.");

@@ -16,9 +16,7 @@ import com.asomal.imagegallery.domain.dropbox.DropboxApiManager;
 import com.asomal.imagegallery.util.DisplaySize;
 import com.asomal.imagegallery.util.ImageUtil;
 import com.asomal.imagegallery.util.Logger;
-import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.DropboxInputStream;
-import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
 
 /**
@@ -55,6 +53,12 @@ public class ImageCache {
 		return ImageCacheHolder.INSTANCE;
 	}
 
+	/**
+	 * 画像を取得する
+	 * 
+	 * @param filePath ファイルパス
+	 * @return {@link Bitmap}
+	 */
 	public Bitmap getImage(String filePath) {
 		String fileName = new StringBuilder(filePath).substring(1);
 
@@ -80,9 +84,7 @@ public class ImageCache {
 			BufferedInputStream bis = null;
 			OutputStream out = null;
 			try {
-				// out = context.openFileOutput(fileName, Context.MODE_PRIVATE);
-				DropboxAPI<AndroidAuthSession> dropboxApi = new DropboxApiManager(context).getApi();
-				DropboxInputStream dropboxInputStream = dropboxApi.getFileStream(filePath, null);
+				DropboxInputStream dropboxInputStream = new DropboxApiManager(context).getFileStream(filePath);
 				bis = new BufferedInputStream(dropboxInputStream);
 
 				out = context.openFileOutput(fileName, Context.MODE_PRIVATE);

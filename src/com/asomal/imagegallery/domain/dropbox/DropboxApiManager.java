@@ -1,11 +1,15 @@
 package com.asomal.imagegallery.domain.dropbox;
 
+import java.util.List;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 
 import com.asomal.imagegallery.R;
 import com.dropbox.client2.DropboxAPI;
+import com.dropbox.client2.DropboxAPI.DropboxInputStream;
+import com.dropbox.client2.DropboxAPI.Entry;
 import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.session.AccessTokenPair;
@@ -50,7 +54,7 @@ public class DropboxApiManager {
 	 * @return 認証済みAPI
 	 * @throws DropboxException Tokenがnullの時
 	 */
-	public DropboxAPI<AndroidAuthSession> getApi() throws DropboxException {
+	private DropboxAPI<AndroidAuthSession> getApi() throws DropboxException {
 		SharedPreferences sp = context.getSharedPreferences(res.getString(R.string.sp_dropbox_auth),
 				Context.MODE_PRIVATE);
 
@@ -70,5 +74,28 @@ public class DropboxApiManager {
 		dropboxApi.getSession().setAccessTokenPair(tokenPair);
 
 		return dropboxApi;
+	}
+
+	/**
+	 * ファイルを取得する
+	 * 
+	 * @param filePath ファイルのパス
+	 * @return {@link DropboxInputStream}
+	 * @throws DropboxException
+	 */
+	public DropboxInputStream getFileStream(String filePath) throws DropboxException {
+		return getApi().getFileStream(filePath, null);
+	}
+
+	/**
+	 * Dropboxのファイル一覧を取得する
+	 * 
+	 * @param path ファイルパス
+	 * @param maxItemCount 取得する最大項目数
+	 * @return ファイルリスト
+	 * @throws DropboxException
+	 */
+	public List<Entry> getFileList(String path, int maxItemCount) throws DropboxException {
+		return getApi().metadata(path, maxItemCount, null, true, null).contents;
 	}
 }

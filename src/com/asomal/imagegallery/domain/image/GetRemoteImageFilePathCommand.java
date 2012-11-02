@@ -8,9 +8,7 @@ import android.content.Context;
 import com.asomal.imagegallery.domain.dropbox.DropboxApiManager;
 import com.asomal.imagegallery.infrastructure.Command;
 import com.asomal.imagegallery.util.Logger;
-import com.dropbox.client2.DropboxAPI;
 import com.dropbox.client2.DropboxAPI.Entry;
-import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.exception.DropboxException;
 
 /**
@@ -23,6 +21,8 @@ public class GetRemoteImageFilePathCommand implements Command<List<String>> {
 
 	private static final String TAG = GetRemoteImageFilePathCommand.class.getSimpleName();
 
+	private static final int MAX_ITEM_COUNT = 1000;
+
 	Context context;
 
 	public GetRemoteImageFilePathCommand(Context context) {
@@ -33,10 +33,7 @@ public class GetRemoteImageFilePathCommand implements Command<List<String>> {
 	public List<String> execute() {
 		List<String> pathList = new ArrayList<String>();
 		try {
-			DropboxAPI<AndroidAuthSession> dropboxApi = new DropboxApiManager(context).getApi();
-			Entry dirEntry = dropboxApi.metadata("/", 1000, null, true, null);
-
-			List<Entry> fileList = dirEntry.contents;
+			List<Entry> fileList = new DropboxApiManager(context).getFileList("/", MAX_ITEM_COUNT);
 			for (Entry entry : fileList) {
 				pathList.add(entry.path);
 			}
