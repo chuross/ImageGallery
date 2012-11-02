@@ -33,7 +33,7 @@ public class ImageUtil {
 		try {
 			BitmapFactory.Options bmpFactoryOpt = new BitmapFactory.Options();
 			bmpFactoryOpt.inJustDecodeBounds = false;
-			bmpFactoryOpt.inSampleSize = 2;
+			bmpFactoryOpt.inSampleSize = 4;
 
 			src = BitmapFactory.decodeStream(inputStream, null, bmpFactoryOpt);
 

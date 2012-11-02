@@ -20,4 +20,5 @@ public abstract class Executer<T> extends AsyncTask<Void, Void, T> {
 	public void cancel() {
 		task.cancel(true);
 	}
+
 }

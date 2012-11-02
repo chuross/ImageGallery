@@ -46,4 +46,10 @@ public class GetRemoteImageFilePathCommand implements Command<List<String>> {
 
 		return pathList;
 	}
+
+	@Override
+	public void onCanceled() {
+		// TODO 自動生成されたメソッド・スタブ
+
+	}
 }

@@ -9,18 +9,14 @@ import java.util.Map;
  * @author chuross
  * 
  */
-public class ExecuteManager<T> extends HashMap<Integer, Executer<T>> {
+public class ExecuteManager<T> {
 
-	private static final long serialVersionUID = 3269199384142687461L;
 	private Integer count = 0;
 
-	/**
-	 * タスクを追加する
-	 * 
-	 * @param task 非同期タスク
-	 */
-	public void add(Executer<T> task) {
-		put(count++, task);
+	protected Map<Integer, Executer<T>> map;
+
+	public ExecuteManager() {
+		map = new HashMap<Integer, Executer<T>>();
 	}
 
 	/**
@@ -30,17 +26,31 @@ public class ExecuteManager<T> extends HashMap<Integer, Executer<T>> {
 	 * @param task
 	 */
 	public void set(int position, Executer<T> task) {
-		put(position, task);
+		if (map.containsKey(position)) {
+			task.cancel();
+			return;
+		}
+		map.put(position, task);
 		count++;
+	}
+
+	/**
+	 * 指定位置を削除する
+	 * 
+	 * @param position
+	 */
+	public void remove(int position) {
+		map.remove(position);
 	}
 
 	/**
 	 * 全タスクをキャンセルする
 	 */
 	public void cancelAll() {
-		for (Map.Entry<Integer, Executer<T>> task : entrySet()) {
+		for (Map.Entry<Integer, Executer<T>> task : map.entrySet()) {
 			task.getValue().cancel();
 		}
+		map.clear();
 	}
 
 	/**
@@ -49,9 +59,19 @@ public class ExecuteManager<T> extends HashMap<Integer, Executer<T>> {
 	 * @param position キャンセルしたい位置
 	 */
 	public void cancel(int position) {
-		Executer<T> task = get(position);
+		Executer<T> task = map.get(position);
 		task.cancel();
-		remove(position);
+		map.remove(position);
+	}
+
+	/**
+	 * 登録済みかどうか判定する
+	 * 
+	 * @param position キー
+	 * @return true:追加済 false:まだ
+	 */
+	public boolean containsKey(int position) {
+		return map.containsKey(position);
 	}
 
 }

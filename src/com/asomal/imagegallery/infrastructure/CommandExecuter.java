@@ -33,6 +33,15 @@ public class CommandExecuter {
 
 				listener.onFinished(result);
 			}
+
+			@Override
+			protected void onCancelled() {
+				super.onCancelled();
+
+				if (isCancelled()) {
+					command.onCanceled();
+				}
+			}
 		};
 
 	}

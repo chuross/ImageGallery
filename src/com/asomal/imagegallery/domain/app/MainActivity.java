@@ -8,11 +8,11 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.GridView;
 import android.widget.Toast;
 
 import com.asomal.imagegallery.R;
-import com.asomal.imagegallery.domain.dropbox.DropboxDownlodCommand;
 import com.asomal.imagegallery.domain.image.GetRemoteImageFilePathCommand;
 import com.asomal.imagegallery.infrastructure.Command;
 import com.asomal.imagegallery.infrastructure.CommandExecuter;
@@ -38,35 +38,48 @@ public class MainActivity extends Activity {
 		CommandExecuter.post(new GetRemoteImageFilePathCommand(this), new Command.OnFinishListener<List<String>>() {
 
 			@Override
-			public void onFinished(List<String> result) {
-				if (result.size() <= 0) {
+			public void onFinished(List<String> filePathList) {
+				if (filePathList.size() <= 0) {
 					Toast.makeText(MainActivity.this, "ネットワークに接続されていない可能性があります", Toast.LENGTH_LONG).show();
 					return;
 				}
 
-				CommandExecuter.post(new DropboxDownlodCommand(MainActivity.this, result),
-						new Command.OnFinishListener<List<String>>() {
-
-							@Override
-							public void onFinished(List<String> result) {
-								final ImageGridAdapter adapter = new ImageGridAdapter(MainActivity.this, result);
-								GridView gridView = (GridView) findViewById(R.id.main_gridview);
-								gridView.setAdapter(adapter);
-								gridView.setOnScrollListener(new AbsListView.OnScrollListener() {
-
-									@Override
-									public void onScrollStateChanged(AbsListView view, int scrollState) {
-									}
-
-									@Override
-									public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-											int totalItemCount) {
-										adapter.clean(firstVisibleItem);
-									}
-								});
-							}
-						});
+				setGridView(filePathList);
 			}
 		});
+	}
+
+	/**
+	 * @param filePathList ファイルパスリスト
+	 */
+	public void setGridView(List<String> filePathList) {
+		final ImageGridAdapter adapter = new ImageGridAdapter(MainActivity.this, filePathList);
+
+		final GridView gridView = (GridView) findViewById(R.id.main_gridview);
+		gridView.setAdapter(adapter);
+		gridView.setOnScrollListener(new
+				AbsListView.OnScrollListener() {
+
+					@Override
+					public void onScrollStateChanged(AbsListView view, int
+							scrollState) {
+						switch (scrollState) {
+							case OnScrollListener.SCROLL_STATE_IDLE:
+								adapter.clean(gridView.getFirstVisiblePosition(),
+										gridView.getLastVisiblePosition());
+								break;
+							case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+								break;
+							case OnScrollListener.SCROLL_STATE_FLING:
+								break;
+						}
+					}
+
+					@Override
+					public void onScroll(AbsListView view, int firstVisibleItem,
+							int visibleItemCount,
+							int totalItemCount) {
+					}
+				});
 	}
 }

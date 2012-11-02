@@ -21,4 +21,6 @@ public interface Command<T> {
 
 	public T execute();
 
+	public void onCanceled();
+
 }

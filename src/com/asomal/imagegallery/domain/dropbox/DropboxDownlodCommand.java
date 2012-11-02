@@ -92,4 +92,10 @@ public class DropboxDownlodCommand implements Command<List<String>> {
 		dialog.dismiss();
 		return pathList;
 	}
+
+	@Override
+	public void onCanceled() {
+		// TODO 自動生成されたメソッド・スタブ
+
+	}
 }

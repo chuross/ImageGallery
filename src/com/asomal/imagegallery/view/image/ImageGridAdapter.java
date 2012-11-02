@@ -77,6 +77,10 @@ public class ImageGridAdapter extends BaseAdapter {
 		final String filePath = filePathList.get(position);
 		holder.imageView.setTag(filePath);
 
+		if (executeManager.containsKey(position)) {
+			return view;
+		}
+
 		Executer<Bitmap> task = CommandExecuter.post(new GetThumbnailImageCommand(context, filePath),
 				new Command.OnFinishListener<Bitmap>() {
 
@@ -93,13 +97,17 @@ public class ImageGridAdapter extends BaseAdapter {
 					}
 				});
 
-		executeManager.put(position, task);
+		executeManager.set(position, task);
 
 		return view;
 	}
 
-	public void clean(int start) {
-		executeManager.clean(start);
+	public void clean(int firstPosition, int lastPosition) {
+		executeManager.clean(firstPosition, lastPosition);
+	}
+
+	public void cleanAll() {
+		executeManager.cancelAll();
 	}
 
 	private class ViewHolder {
