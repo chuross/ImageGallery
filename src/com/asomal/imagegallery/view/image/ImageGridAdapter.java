@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 
 import com.asomal.imagegallery.R;
 import com.asomal.imagegallery.domain.image.GetThumbnailImageCommand;
+import com.asomal.imagegallery.domain.image.ImageCache;
 import com.asomal.imagegallery.infrastructure.Command;
 import com.asomal.imagegallery.infrastructure.CommandExecuter;
 import com.asomal.imagegallery.infrastructure.Executer;
@@ -26,16 +27,19 @@ import com.asomal.imagegallery.infrastructure.ListViewExecuteManager;
  */
 public class ImageGridAdapter extends BaseAdapter {
 
+	private static final int MAX_CACHE = 100;
 	LayoutInflater inflater;
 	List<String> filePathList;
 	Context context;
 	ListViewExecuteManager<Bitmap> executeManager;
+	ImageCache cache;
 
 	public ImageGridAdapter(Context context, List<String> filePathList) {
 		this.context = context;
 		this.filePathList = filePathList;
 		inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		executeManager = new ListViewExecuteManager<Bitmap>();
+		cache = new ImageCache(context, MAX_CACHE, ImageCache.Type.THUMBNAIL);
 	}
 
 	@Override
@@ -81,7 +85,7 @@ public class ImageGridAdapter extends BaseAdapter {
 			return view;
 		}
 
-		Executer<Bitmap> task = CommandExecuter.post(new GetThumbnailImageCommand(context, filePath),
+		Executer<Bitmap> task = CommandExecuter.post(new GetThumbnailImageCommand(context, filePath, cache),
 				new Command.OnFinishListener<Bitmap>() {
 
 					@Override

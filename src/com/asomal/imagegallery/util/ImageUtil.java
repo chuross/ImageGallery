@@ -17,6 +17,51 @@ public class ImageUtil {
 	private static final String TAG = ImageUtil.class.getSimpleName();
 
 	/**
+	 * 詳細画像を取得する
+	 * 
+	 * @param requestWidth 幅
+	 * @param requestHeight 高さ
+	 * @param inputStream {@link InputStream}
+	 * @return {@link Bitmap}
+	 */
+	public static Bitmap getDetail(float requestWidth, float requestHeight, InputStream inputStream) {
+		if (requestWidth <= 0 || requestHeight <= 0) {
+			return null;
+		}
+
+		Bitmap src = null;
+		try {
+			BitmapFactory.Options bmpFactoryOpt = new BitmapFactory.Options();
+			bmpFactoryOpt.inJustDecodeBounds = false;
+			bmpFactoryOpt.inSampleSize = 2;
+
+			src = BitmapFactory.decodeStream(inputStream, null, bmpFactoryOpt);
+
+			if (src == null) {
+				Log.e(TAG, "getDetail src is null.");
+				return null;
+			}
+
+			int srcWidth = src.getWidth();
+			int srcHeight = src.getHeight();
+
+			float wScale = srcWidth / requestWidth;
+			float hScale = srcHeight / requestHeight;
+			float scale = Math.max(wScale, hScale);
+
+			int resizeWidth = (int) Math.ceil(srcWidth / scale);
+			int resizeHeight = (int) Math.ceil(srcHeight / scale);
+
+			return Bitmap.createScaledBitmap(src, resizeWidth, resizeHeight, false);
+		} finally {
+			if (src != null) {
+				src.recycle();
+				src = null;
+			}
+		}
+	}
+
+	/**
 	 * 画像のサムネイルを取得
 	 * 
 	 * @param requestSize 生成する画像サイズ
@@ -24,7 +69,7 @@ public class ImageUtil {
 	 * @return 正方形の{@link Bitmap}
 	 */
 	public static Bitmap getThumbnail(float requestSize, InputStream inputStream) {
-		if (requestSize < 1) {
+		if (requestSize <= 0) {
 			return null;
 		}
 

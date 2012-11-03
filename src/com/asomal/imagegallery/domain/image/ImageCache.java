@@ -3,7 +3,6 @@ package com.asomal.imagegallery.domain.image;
 import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.NavigableMap;
 import java.util.TreeMap;
@@ -27,30 +26,41 @@ import com.dropbox.client2.exception.DropboxException;
  */
 public class ImageCache {
 
-	// メモリキャッシュする数
-	private static final int MAX_CACHE = 100;
+	public enum Type {
+		/**
+		 * サムネイル画像
+		 */
+		THUMBNAIL,
+
+		/**
+		 * 詳細画像
+		 */
+		DETAIL;
+	}
 
 	private static final String TAG = ImageCache.class.getSimpleName();
 
-	// サムネイルサイズ
 	private static final float THUMBNAIL_DP = 100;
 
-	private static NavigableMap<String, Bitmap> memCache = new TreeMap<String, Bitmap>();
+	private NavigableMap<String, Bitmap> memCache;
 
-	private static Context context;
+	private Context context;
 
-	private static class ImageCacheHolder {
-		private static ImageCache INSTANCE = new ImageCache();
-	}
+	private int maxCache;
+
+	Type type;
 
 	/**
-	 * インスタンスを取得する
-	 * 
-	 * @return {@link ImageCache}
+	 * @param context {@link Context}
 	 */
-	public static ImageCache getInstance(Context context) {
-		ImageCache.context = context;
-		return ImageCacheHolder.INSTANCE;
+	public ImageCache(Context context, int maxCache, Type type) {
+		if (type == null) {
+			throw new IllegalArgumentException("type is null.");
+		}
+		this.context = context;
+		this.maxCache = maxCache;
+		this.type = type;
+		memCache = new TreeMap<String, Bitmap>();
 	}
 
 	/**
@@ -70,11 +80,17 @@ public class ImageCache {
 
 		// ローカルファイルからの読み込み
 		try {
-			InputStream in = context.openFileInput(fileName);
+			BufferedInputStream bis = new BufferedInputStream(context.openFileInput(fileName));
 
 			Log.d(TAG, fileName + " read local.");
 
-			Bitmap image = ImageUtil.getThumbnail(DisplaySize.getInstance(context).pxToDip(THUMBNAIL_DP), in);
+			Bitmap image;
+			if (type == Type.THUMBNAIL) {
+				image = ImageUtil.getThumbnail(DisplaySize.getInstance(context).pxToDip(THUMBNAIL_DP), bis);
+			} else {
+				DisplaySize dispSize = DisplaySize.getInstance(context);
+				image = ImageUtil.getDetail(dispSize.getDisplayWidth(), dispSize.getDisplayHeight(), bis);
+			}
 			setImage(fileName, image);
 
 			return image;
@@ -99,7 +115,13 @@ public class ImageCache {
 				bis = new
 						BufferedInputStream(context.openFileInput(fileName));
 
-				Bitmap image = ImageUtil.getThumbnail(DisplaySize.getInstance(context).pxToDip(THUMBNAIL_DP), bis);
+				Bitmap image;
+				if (type == Type.THUMBNAIL) {
+					image = ImageUtil.getThumbnail(DisplaySize.getInstance(context).pxToDip(THUMBNAIL_DP), bis);
+				} else {
+					DisplaySize dispSize = DisplaySize.getInstance(context);
+					image = ImageUtil.getDetail(dispSize.getDisplayWidth(), dispSize.getDisplayHeight(), bis);
+				}
 				setImage(fileName, image);
 
 				return image;
@@ -135,7 +157,7 @@ public class ImageCache {
 	 * @param image {@link Bitmap}
 	 */
 	public void setImage(String key, Bitmap image) {
-		if (memCache.size() > MAX_CACHE) {
+		if (memCache.size() > maxCache) {
 			memCache.remove(memCache.firstKey());
 		}
 		memCache.put(key, image);

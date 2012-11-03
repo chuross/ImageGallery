@@ -8,28 +8,33 @@ import android.graphics.Bitmap;
 import com.asomal.imagegallery.infrastructure.Command;
 import com.asomal.imagegallery.util.Logger;
 
-public class GetThumbnailImageCommand implements Command<Bitmap> {
+/**
+ * 詳細画像を取得する
+ * 
+ * @author chuross
+ * 
+ */
+public class GetDetailImageCommand implements Command<Bitmap> {
 
-	private static final String TAG = GetThumbnailImageCommand.class.getSimpleName();
-
-	String filePath;
+	private static final String TAG = GetDetailImageCommand.class.getSimpleName();
 	Context context;
+	String path;
 	private ImageCache cache;
 
-	public GetThumbnailImageCommand(Context context, String filePath, ImageCache cache) {
+	public GetDetailImageCommand(Context context, String path, ImageCache cache) {
 		this.context = context;
-		this.filePath = filePath;
+		this.path = path;
 		this.cache = cache;
 	}
 
 	@Override
 	public Bitmap execute() {
-		return cache.getImage(filePath);
+		return cache.getImage(path);
 	}
 
 	@Override
 	public void onCanceled() {
-		String fileName = new StringBuilder(filePath).substring(1);
+		String fileName = new StringBuilder(path).substring(1);
 		try {
 			if (context.openFileInput(fileName) != null) {
 				return;
@@ -41,4 +46,5 @@ public class GetThumbnailImageCommand implements Command<Bitmap> {
 			Logger.d(TAG, "Cancel file is not created.");
 		}
 	}
+
 }

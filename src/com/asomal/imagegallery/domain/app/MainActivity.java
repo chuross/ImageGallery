@@ -1,5 +1,6 @@
 package com.asomal.imagegallery.domain.app;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
@@ -7,8 +8,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -52,11 +55,19 @@ public class MainActivity extends Activity {
 	/**
 	 * @param filePathList ファイルパスリスト
 	 */
-	public void setGridView(List<String> filePathList) {
+	public void setGridView(final List<String> filePathList) {
 		final ImageGridAdapter adapter = new ImageGridAdapter(MainActivity.this, filePathList);
 
 		final GridView gridView = (GridView) findViewById(R.id.main_gridview);
 		gridView.setAdapter(adapter);
+		gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				startActivity(DetailActivity
+						.createIntent(MainActivity.this, position, (ArrayList<String>) filePathList));
+			}
+		});
 		gridView.setOnScrollListener(new
 				AbsListView.OnScrollListener() {
 

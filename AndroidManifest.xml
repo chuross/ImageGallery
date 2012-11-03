@@ -23,6 +23,8 @@
         </activity>
         <activity android:name=".domain.app.DropboxAuthActivity" >
         </activity>
+        <activity android:name=".domain.app.DetailActivity" >
+        </activity>
         <activity
             android:name="com.dropbox.client2.android.AuthActivity"
             android:configChanges="orientation|keyboard"
